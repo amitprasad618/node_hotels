@@ -2,6 +2,7 @@ var fs = require('fs');
 var os = require('os');
 const express = require('express');
 const app = express();
+require('dotenv').config();
 
 var demo = require('./demo.js');
 var _ = require('lodash');
@@ -93,6 +94,7 @@ app.get('/',(req,res)=>{
 
 
 
-app.listen(3000,()=>{
+const PORT = process.env.PORT || 3000;
+app.listen(PORT,()=>{
     console.log("Server is running!!");
 })
