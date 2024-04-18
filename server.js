@@ -3,15 +3,25 @@ var os = require('os');
 const express = require('express');
 const app = express();
 require('dotenv').config();
+const passport = require('./auth.js');
 
 var demo = require('./demo.js');
 var _ = require('lodash');
 const db = require('./db.js');
 
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());  // req.body
 
+// Middleware
+const logRequest = (req, res, next) =>{
+    console.log(`[${new Date().toLocaleString()}] Request to URL: ${req.originalUrl}`);
+    next(); //move to next phase
+}
 
+app.use(logRequest);
+
+app.use(passport.initialize());
 
 
 // function add(a,b){
@@ -80,17 +90,21 @@ app.use(bodyParser.json());  // req.body
 // console.log(_.isString(true));
 
 
-const personRoutes = require('./Routes/personRoutes.js');
 
-app.use('/person', personRoutes);
-
-const menuItemRoutes = require('./Routes/taskRoutes.js');
-app.use('/menuItem',menuItemRoutes);
-
-
-app.get('/',(req,res)=>{
+app.get('/', (req,res)=>{
     res.send("Welcome to My Hotel!!... What can I help you..??");
 });
+
+const localAuthMiddleware = passport.authenticate('local', {session: false});
+const personRoutes = require('./Routes/personRoutes.js');
+app.use('/person', localAuthMiddleware, personRoutes);
+
+const menuItemRoutes = require('./Routes/taskRoutes.js');
+
+
+app.use('/menuItem', menuItemRoutes);
+
+
 
 
 
